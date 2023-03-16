@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Net.Sockets;
+using System.Net;
 
 using System;
 
@@ -6,6 +7,13 @@ namespace HelloServer
 {
     class Program
     {
+
+
+        static void Main(string[] args)
+        {
+            TcpClient.Main();
+        }
+
         // static void Main(string[] args)
         // {
 

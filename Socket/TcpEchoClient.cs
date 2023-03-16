@@ -21,10 +21,10 @@ namespace HelloClient
 
 
             //Zet String input om in bytes
-            byte[] byteBuffer = Encoding.ASCII.GetBytes(args[1]);
+            byte[] byteBuffer = Encoding.UTF8.GetBytes(args[1]);
 
             //Gebruik port argument indien aanwezig, anders gebruikt hij standaard 11000
-            int serverPort = (args.Length == 3) ? Int32.Parse(args[2]) : 11000;
+            int serverPort = (args.Length == 3) ? Int32.Parse(args[2]) : 21000;
 
             TcpClient client = null;
             NetworkStream netStream = null;
