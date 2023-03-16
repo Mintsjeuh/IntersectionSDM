@@ -16,15 +16,13 @@ namespace HelloClient
                 throw new ArgumentException("Parameters: <Server> <Word> [<Port>]");
             }
 
-
             String server = args[0];        // Server name or IP addres
-
 
             //Zet String input om in bytes
             byte[] byteBuffer = Encoding.UTF8.GetBytes(args[1]);
 
             //Gebruik port argument indien aanwezig, anders gebruikt hij standaard 11000
-            int serverPort = (args.Length == 3) ? Int32.Parse(args[2]) : 21000;
+            int serverPort = (args.Length == 3) ? Int32.Parse(args[2]) : 7;
 
             TcpClient client = null;
             NetworkStream netStream = null;
@@ -42,21 +40,24 @@ namespace HelloClient
                 netStream.Write(byteBuffer, 0, byteBuffer.Length);
 
                 Console.WriteLine("Sent {0} bytes to server...", byteBuffer.Length);
+                Console.WriteLine(byteBuffer.Length);
 
+                byte[] byteReceivedBuffer = new byte[1024];
+                int bytesRcvd = netStream.Read(byteReceivedBuffer, 0, byteReceivedBuffer.Length);
                 int totalBytesRcvd = 0;
-                int bytesRcvd = 0;
 
                 //Ontvang dezelfde string terug vanaf de server
-                while (totalBytesRcvd < byteBuffer.Length)
+                while (totalBytesRcvd < bytesRcvd)
                 {
-                    if ((bytesRcvd = netStream.Read(byteBuffer, totalBytesRcvd, byteBuffer.Length - totalBytesRcvd)) == 0)
+                    if (bytesRcvd == 0)
                     {
                         Console.WriteLine("Connection closed prematurely.");
                         break;
                     }
-                    totalBytesRcvd += bytesRcvd;
+                    totalBytesRcvd++;
+
                 }
-                Console.WriteLine("Received {0} byes from the server: {1}", totalBytesRcvd, Encoding.ASCII.GetString(byteBuffer, 0, totalBytesRcvd));
+                Console.WriteLine("Received {0} byes from the server: {1}", bytesRcvd, Encoding.UTF8.GetString(byteReceivedBuffer, 0, bytesRcvd));
             }
             catch (Exception e)
             {
@@ -74,3 +75,4 @@ namespace HelloClient
     }
 
 }
+
