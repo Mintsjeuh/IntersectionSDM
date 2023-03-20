@@ -1,5 +1,12 @@
 import Controller.Light as light
 
+def set_weight(deserialized_JSON, lights_array):
+    for i in range(len(deserialized_JSON)):
+        if ():
+            id = deserialized_JSON[i][0]
+            weight = deserialized_JSON[i][1]
+    return lights_array
+
 def set_priority(lights_array):
     for i in range(0, len(lights_array)):
         if (lights_array[i].id == "8.1"):
