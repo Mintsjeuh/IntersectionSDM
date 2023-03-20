@@ -1,6 +1,10 @@
 import socketserver
+import Controller.encoder as encoder
+import Controller.ConnectedClient as connected_client
+import Controller.traffic_controller as controller
 
-HOST = "192.168.1.229"
+# HOST = "141.252.221.98"
+HOST = "192.168.2.22"
 PORT = 11000
 
 class TCPHandler(socketserver.BaseRequestHandler):
@@ -13,19 +17,25 @@ class TCPHandler(socketserver.BaseRequestHandler):
     """
 
     def handle(self):
+        client = []
         # self.request is the TCP socket connected to the client
-        connection = self.request
-        print("connection:", type(connection))
+        client_connection = self.request
         client_address = self.client_address[0]
-        print("address:", client_address)
 
-        receive(connection, client_address)
+        client.append(client_connection)
+        client.append(client_address)
+
+        connected_client_array = connected_client.ReturnConnectedClient()
+        connected_client_array.connected_client = client
+
+        controller.handle_connection()
 
 
 def receive(connection, client_address):
     received_bytes = connection.recv(1024).strip()
     received_string = received_bytes.decode('utf8')
     print("Received string from simulator at", client_address, received_string)
+    return received_string
 
 
 def send():
@@ -37,7 +47,7 @@ def send():
 
 # if __name__ == "__main__":
 
-def initialize():
+def run():
     # Create the server, binding to HOST on PORT
     with socketserver.TCPServer((HOST, PORT), TCPHandler) as server:
         # Activate the server; this will keep running until you interrupt the program
