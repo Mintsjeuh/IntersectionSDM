@@ -1,11 +1,12 @@
 import socketserver
-import Controller.encoder as encoder
 import Controller.ConnectedClient as connected_client
 import Controller.traffic_controller as controller
+import socket
 
-# HOST = "141.252.221.98"
-HOST = "192.168.2.22"
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = 11000
+
+client = connected_client.ReturnConnectedClient()
 
 class TCPHandler(socketserver.BaseRequestHandler):
     """
@@ -32,20 +33,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 
 def receive(connection, client_address):
-    received_bytes = connection.recv(1024).strip()
+    received_bytes = connection.recv(2048).strip()
     received_string = received_bytes.decode('utf8')
     print("Received string from simulator at", client_address, received_string)
     return received_string
 
 
-def send():
+def send(data):
     # send the JSON-string to the client
-    send_data = '[{"id": 8.1, "status": 2}]'
+    send_data = data
     send_bytes = send_data.encode(encoding='utf8')
-    TCPHandler.request.sendall(send_bytes)
-    print("Sent bytes to simulator: ", send_bytes)
+    client.connected_client[0].sendall(send_bytes)
 
-# if __name__ == "__main__":
+    print("Sent bytes to simulator: ", send_bytes)
 
 def run():
     # Create the server, binding to HOST on PORT

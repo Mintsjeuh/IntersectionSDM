@@ -1,7 +1,6 @@
 import Controller.traffic_controller as controller
 import Controller.socket_server as server
 
-
 def main():
     controller.initialize_lights()
     server.run()
