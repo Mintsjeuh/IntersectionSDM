@@ -3,52 +3,108 @@ import Controller.encoder as encoder
 import Controller.ConnectedClient as connected_client
 import Controller.socket_server as server
 import Controller.TrafficLights as traffic_lights
+import Controller.vehicle_priorities as vehicle_priorities
 
 # id of all traffic lights
-lights_id_array = [float(42.0), float(1.1), float(2.1), float(5.1), float(6.1), float(7.1), float(8.1), float(9.1), float(10.1), float(11.1), float(12.1)]
+bus_id = float(42.0)
+# train_id = float(99.0)
+
+pedestrian_west = float(35.1), float(35.2), float(36.1), float(36.2)
+bike_lane_west = float(86.1), float(26.1)
+
+pedestrian_north = float(37.2), float(37.1), float(38.1), float(38.2)
+bike_lane_north = float(88.1), float(28.1)
+
+pedestrian_east = float(31.2), float(31.1), float(32.1), float(32.2)
+bike_lane_east = float(22.0)
+
+lights_id_array = [bus_id,
+                   float(1.1),
+                   float(2.1),
+                   float(5.1),
+                   float(6.1),
+                   float(7.1),
+                   float(8.1),
+                   float(9.1),
+                   float(10.1),
+                   float(11.1),
+                   float(12.1),
+                   float(35.1), float(35.2), float(36.1), float(36.2),  # pedestrian_west
+                   float(37.2), float(37.1), float(38.1), float(38.2),  # pedestrian_north
+                   float(31.2), float(31.1), float(32.1), float(32.2),  # pedestrian_east
+                   float(86.1), float(26.1),  # bike_lane_west
+                   float(88.1), float(28.1),  # bike_lane_north
+                   float(22.0)  # bike_lane_east
+                   ]
 
 green_stages = [
-    [float(1.1), float(2.1), float(7.1), float(8.1)],
-    [float(5.1), float(7.1), float(10.1), float(11.1)],
-    [float(6.1), float(12.1)],
-    [float(9.1)],
-    [float(42.0), float(8.1), float(7.1)]
+    [float(1.1), float(2.1), float(7.1), float(8.1), 0],
+    [float(5.1), float(10.1), float(11.1), 0],
+    [float(6.1), float(12.1), 0],
+    # [float(9.1), 0],
+    [float(35.1), float(35.2), float(36.1), float(36.2),  # pedestrian_west
+     float(86.1), float(26.1),  # bike_lane_west
+     float(5.1), float(11.1), 0],
+
+    [float(37.2), float(37.1), float(38.1), float(38.2),
+     float(88.1), float(28.1),
+     float(2.1), float(7.1), float(8.1), 0],
+
+    [float(31.2), float(31.1), float(32.1), float(32.2),
+     float(22.0),
+     float(7.1), float(9.1), 0]
+]
+
+priority_green_stages = [
+    [float(42.0), float(7.1), float(8.1), "bus_green_stage"]
 ]
 
 traffic_lights_array = traffic_lights.ReturnTrafficLights()
 connected_client_array = connected_client.ReturnConnectedClient()
+
 
 # initialize light objects
 def initialize_lights():
     lights_array = []
 
     for i in range(0, len(lights_id_array)):
-        lights_array.append(light.Light(lights_id_array[i], status=0, weight=0))
+        lights_array.append(light.Light(lights_id_array[i], status=0, weight=0, red_time=0))
     traffic_lights_array.traffic_lights = lights_array
 
 
 def handle_connection():
     current_connection = connected_client_array.connected_client
-    while (True):
+
+    while True:
         received_JSON = server.receive(connection=current_connection[0], client_address=current_connection[1])
         deserialized_JSON = encoder.deserialize(received_JSON)
 
         weighted_lights_array = set_weight(deserialized_JSON)
-        calculated_weights_array = calculate_green_stage_weights(weighted_lights_array)
-        green_stage = sort_green_stages(calculated_weights_array)
+
+        if check_vehicle_priorities() != False:
+            green_stage = check_vehicle_priorities()
+        else:
+            calculated_weights_array = calculate_green_stage_weights(weighted_lights_array)
+            print("ALL WEIGHTS FOR GREEN STAGES:", calculated_weights_array)
+            green_stage = sort_green_stages(calculated_weights_array)
+
+        print("CURRENT GREEN STAGE SELECTED:", green_stage)
+
         set_lights_array = set_lights(green_stage)
-        # for i in range(len(set_lights_array)):
-        #     print(weighted_lights_array[i].id, weighted_lights_array[i].status, weighted_lights_array[i].weight)
+
         print(traffic_lights_array.traffic_lights)
         server.send(encoder.serialize(traffic_lights_array.traffic_lights))
 
 
-
-
 def set_weight(deserialized_JSON):
     weighted_lights_array = traffic_lights_array.traffic_lights
-    for i in range (len(weighted_lights_array)):
-        if (weighted_lights_array[i].id == deserialized_JSON[i][0]):
+    for i in range(len(weighted_lights_array)):
+        # use deserialized_JSON [0][0] for testing
+        # if weighted_lights_array[i].id == deserialized_JSON[0][0]:
+        #     weighted_lights_array[i].weight = deserialized_JSON[0][1]
+
+        # use deserialized_JSON[i][0] for working code
+        if weighted_lights_array[i].id == deserialized_JSON[i][0]:
             weighted_lights_array[i].weight = deserialized_JSON[i][1]
 
     traffic_lights_array.traffic_lights = weighted_lights_array
@@ -59,6 +115,18 @@ def set_weight(deserialized_JSON):
     return weighted_lights_array
 
 
+def check_vehicle_priorities():
+    # if vehicle_priorities.check(train_id):
+    #     if vehicle_priorities.check(bus_id):
+    #         return  # train_and_bus_green_stage
+    #     return  # train_green_stage
+
+    if vehicle_priorities.check(bus_id):
+        return [b for b in priority_green_stages if b[-1] == "bus_green_stage"][0]
+    else:
+        return False
+
+
 def calculate_green_stage_weights(weighted_lights_array):
     for i in range(len(green_stages)):
         green_stage_total_weight = 0
@@ -67,15 +135,12 @@ def calculate_green_stage_weights(weighted_lights_array):
                 if green_stages[i][j] == weighted_lights_array[k].id:
                     green_stage_total_weight += weighted_lights_array[k].weight
 
-        green_stages[i].append(green_stage_total_weight)
+        green_stages[i][-1] = green_stage_total_weight
     return green_stages
 
 
 def sort_green_stages(calculated_weights_array):
     sorted_green_stages = sorted(calculated_weights_array, key=lambda x: x[-1], reverse=True)
-    for i in range(len(sorted_green_stages)):
-        sorted_green_stages[i].pop()
-
     return sorted_green_stages[0]
 
 

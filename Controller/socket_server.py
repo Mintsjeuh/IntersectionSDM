@@ -48,6 +48,7 @@ def send(data):
     print("Sent bytes to simulator: ", send_bytes)
 
 def run():
+    print("IP-address of server:", HOST)
     # Create the server, binding to HOST on PORT
     with socketserver.TCPServer((HOST, PORT), TCPHandler) as server:
         # Activate the server; this will keep running until you interrupt the program

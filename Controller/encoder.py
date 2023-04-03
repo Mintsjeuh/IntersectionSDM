@@ -15,8 +15,9 @@ def serialize(lights_array):
 
 def deserialize(lights_array_JSON):
     deserialized_JSON = []
+    print("Lights array in deserialize:", lights_array_JSON)
     lights_array_JSON = json.loads(lights_array_JSON)
-    for i in range (0, len(lights_array_JSON)):
+    for i in range(len(lights_array_JSON)):
         deserialized_JSON.append([lights_array_JSON[i]['id'], lights_array_JSON[i]['weight']])
 
     return deserialized_JSON
