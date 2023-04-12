@@ -17,15 +17,15 @@ public class CarSpawnerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (timer < spawnRate)
-        {
-            timer = timer + Time.deltaTime;
-        }
-        else
-        {
-            SpawnCar();
-            timer = 0;
-        }
+        //if (timer < spawnRate)
+        //{
+        //    timer = timer + Time.deltaTime;
+        //}
+        //else
+        //{
+        //    SpawnCar();
+        //    timer = 0;
+        //}
     }
 
     void SpawnCar()
