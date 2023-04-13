@@ -12,9 +12,10 @@ clear_traffic_time = 3
 
 # id of all traffic lights
 bus_id = float(42.0)
-# train_id = float(99.0)
+train_id = float(99.0)
 
 lights_id_array = [bus_id,
+                   train_id,
                    float(1.1),
                    float(2.1),
                    float(5.1),
@@ -57,7 +58,9 @@ green_stages = [
 ]
 
 priority_green_stages = [
-    [float(42.0), float(7.1), float(8.1), "bus_green_stage"]
+    [float(42.0), float(7.1), float(8.1), "bus_green_stage"],
+    [float(99.0), float(1.1), float(2.1), float(8.1), "train_green_stage"],
+    [float(99.0), float(42.0), float(8.1), "train_and_bus_green_stage"]
 ]
 
 traffic_lights_array = traffic_lights.ReturnTrafficLights()
@@ -155,12 +158,12 @@ def set_weight(deserialized_JSON):
 
 def check_vehicle_priorities():
     # train prio
-    # if vehicle_priorities.check(train_id):
-    #     if vehicle_priorities.check(bus_id):
-    #         return  # train_and_bus_green_stage
-    #     return  # train_green_stage
+    if vehicle_priorities.check(train_id):
+        if vehicle_priorities.check(bus_id):
+            return [tb for tb in priority_green_stages if tb[-1] == "train_and_bus_green_stage"][0]
+        return [t for t in priority_green_stages if t[-1] == "train_green_stage"][0]
 
-    if vehicle_priorities.check(bus_id):
+    elif vehicle_priorities.check(bus_id):
         return [b for b in priority_green_stages if b[-1] == "bus_green_stage"][0]
 
     else:

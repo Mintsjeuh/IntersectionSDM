@@ -11,6 +11,7 @@ PORT = 11000  # The port used by the server.
 
 def set_data():
     send_data = '[{"id": 42.0, "weight": ' + str(random.randint(0, 1)) + '},' \
+                ' {"id": 99.0, "weight": ' + str(random.randint(0, 1)) + '},' \
                 ' {"id": 1.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 2.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 5.1, "weight": ' + str(random.randint(0, 20)) + '},' \
