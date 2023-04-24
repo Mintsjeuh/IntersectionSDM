@@ -1,64 +1,96 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using UnityEngine;
-using sleep = System.Threading.Thread;
+using System.Linq;
+using UnityEngine.UIElements;
 
-public class ClientConnectionScript : MonoBehaviour
+public class ClientConnectionScript
 {
-    // Start is called before the first frame update
-    void Start()
+    // TODO: singleton
+    private List<ISubscriber> subscribers;
+    private readonly TcpClient client;
+    private readonly Thread thread;
+
+    public ClientConnectionScript(string ipAddress, short portNumber)
     {
-        TcpConnection();
+        subscribers = new List<ISubscriber>();
+        client = new TcpClient(ipAddress, portNumber);
+        thread = new Thread(() => Run());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Destructor
+    ~ClientConnectionScript() =>
 
-    public static void TcpConnection()
+        client.Close();
+
+    public bool Write(string message)
     {
         try
         {
-            TcpClient client = new TcpClient();
-            Debug.Log("\n Connecting...");
-            // 127.0.0.1 -> local host
-            //
-            client.Connect("", 11000);
-
-            Debug.Log("Connected");
-            while (client.Connected)
-            {
-                Stream stream = client.GetStream();
-                UTF8Encoding encoding = new UTF8Encoding();
-
-                // The data that will be send
-                double busDouble = 42.0;
-                string testString = "[{" + '"' + "id" + '"' + ':' + busDouble + ',' + '"' + "weight" + '"' + ':' + 1 + "}]";
-
-                // Sends data to the server
-                byte[] sendData = Encoding.UTF8.GetBytes(testString);
-                Debug.Log("Sending data to server");
-                stream.Write(sendData, 0, sendData.Length);
-
-                // Receives data from the server
-                byte[] receiveBytes = new byte[1024];
-                int receiveData = stream.Read(receiveBytes, 0, receiveBytes.Length);
-                string result = Encoding.UTF8.GetString(receiveBytes);
-                Debug.Log("Result: " + result);
-
-                // Clears the stream a.k.a. flushes the stream
-                stream.Flush();
-                sleep.Sleep(2000);
-            }
-            client.Close();
+            byte[] sendData = Encoding.UTF8.GetBytes($"{message}\n");
+            client.GetStream().Write(sendData, 0, sendData.Length);
         }
         catch (Exception e)
         {
             Debug.LogException(e);
+            return false;
         }
+        return true;
+    }
+
+    public void Subscribe(ISubscriber subscriber)
+    {
+        subscribers.Add(subscriber);
+    }
+
+    public void Run()
+    {
+        while (client.Connected)
+        {
+            byte[] receivedBytes = new byte[1024];
+            NetworkStream stream = client.GetStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = stream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                var incomingData = new byte[length];
+                Array.Copy(buffer, 0, incomingData, 0, length);
+                string serverMessage = Encoding.UTF8.GetString(incomingData);
+
+                Debug.Log(serverMessage);
+                //Dictionary<double, int> json = JSON.StringToDictionary(serverMessage);
+                //SimulationController.Instance.Orders = json;
+                // TODO: Convert serverMessage from JSON to TrafficOrder.
+                //Debug.Log("server message received as: " + mockjson);
+
+
+            }
+
+
+            stream.Read(receivedBytes, 0, receivedBytes.Length);
+            string receivedData = Encoding.UTF8.GetString(receivedBytes);
+
+            Debug.Log(receivedData);
+            //foreach (string line in receivedData.Split('\n'))
+            //{
+            //    // TODO: JSON deserialize - received
+
+            //    foreach (ISubscriber subscriber in subscribers)
+            //    {
+            //        // TODO: Call subscribers
+            //    }
+            //}
+        }
+    }
+
+    // All classes can subscribe and will receive their right model
+    public interface ISubscriber
+    {
+        // TODO: Add JSON model parameter
+        void OnReceive();
     }
 }

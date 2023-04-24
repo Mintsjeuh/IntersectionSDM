@@ -146,6 +146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fe1c771772085f459b6e4f243a65fec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accelerationPower: 5
-  steeringPower: 5
+  waypoints: []
+  moveSpeed: 2
+  deadZoneLeft: -25
+  deadZoneRight: 25
   myRigidbody: {fileID: 4000058774366617110}
