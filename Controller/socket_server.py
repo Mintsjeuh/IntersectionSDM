@@ -35,6 +35,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 def receive(connection, client_address):
     received_bytes = connection.recv(2048).strip()
     received_string = received_bytes.decode('utf8')
+    #  received_string = received_string.split('\n')[0]  # only receive one string from simulator
     print("Received string from simulator at", client_address, received_string)
     return received_string
 

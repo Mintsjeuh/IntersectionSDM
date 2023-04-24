@@ -38,7 +38,10 @@ def set_data():
                 ' {"id": 31.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 32.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 32.2, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 22.0, "weight": ' + str(random.randint(0, 20)) + '}]'
+                ' {"id": 22.0, "weight": ' + str(random.randint(0, 20)) + '},' \
+                ' {"id": 152.0, "weight": ' + str(random.randint(0, 20)) + '},' \
+                ' {"id": 154.0, "weight": ' + str(random.randint(0, 20)) + '},' \
+                ' {"id": 160.0, "weight": ' + str(random.randint(0, 20)) + '}]'
 
     return send_data
 
@@ -48,12 +51,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     send_data = set_data()
     send_bytes = send_data.encode(encoding='utf8')
     s.sendall(send_bytes)
+
     while True:
-        if s.recv(2048).strip() is not None:
-            send_data = set_data()
-            send_bytes = send_data.encode(encoding='utf8')
-            s.sendall(send_bytes)
-        else:
-            time.sleep(1)
+        s.recv(2048).strip()
+        send_data = set_data()
+        send_bytes = send_data.encode(encoding='utf8')
+        s.sendall(send_bytes)
+        time.sleep(0.5)
+
 
 
