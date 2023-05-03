@@ -4,8 +4,20 @@ using UnityEngine;
 
 public class TrafficLightScript : MonoBehaviour
 {
+
+
+
+    //public SpriteRenderer LigthSprite;
+    //public Sprite[] spriteArray = new Sprite[10];
+    [SerializeField] private double _id;
+
+    [SerializeField] public double Id { get; set; }
+    [SerializeField] public int Status { get; set; }
+
+
     public SpriteRenderer mySpriteRenderer;
-    enum TrafficLightStatus{
+    enum TrafficLightStatus
+    {
         Red,
         Orange,
         Green
@@ -17,7 +29,7 @@ public class TrafficLightScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -31,9 +43,13 @@ public class TrafficLightScript : MonoBehaviour
             case TrafficLightStatus.Orange:
                 mySpriteRenderer.color = new Color(255, 165, 0);
                 break;
-            case TrafficLightStatus.Green: 
-                mySpriteRenderer.color = Color.green; 
+            case TrafficLightStatus.Green:
+                mySpriteRenderer.color = Color.green;
                 break;
         }
     }
+
+
+
+
 }

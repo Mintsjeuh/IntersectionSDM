@@ -1,18 +1,17 @@
 ﻿<Properties StartupConfiguration="{DAF75E4B-F777-2F92-6CA2-A5A78E24BAB5}|">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="1db5fed6-1534-442e-8c0e-e7679563619d" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/TrafficTriggerScript.cs">
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/ClientConnectionCode/TcpEchoClient.cs">
     <Files>
-      <File FileName="Assets/Scripts/CarLogicScript.cs" Line="34" Column="10" />
-      <File FileName="Assets/Scripts/CarSpawnerScript.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/MovementLogic.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/TrafficTriggerScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/ClientConnectionCode/TcpEchoClient.cs" Line="28" Column="38" />
+      <File FileName="Assets/Scripts/SceneManagerScript.cs" Line="11" Column="45" />
       <File FileName="Assets/Scripts/TrafficLightScript.cs" Line="1" Column="1" />
-      <File FileName="Assets/ClientConnectionCode/ClientScript.cs" Line="41" Column="55" />
+      <File FileName="Assets/Scripts/TrafficLigth.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/TrafficLigthController.cs" Line="22" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -20,19 +19,14 @@
           <Node name="Simulatie-Unity" expanded="True">
             <Node name="Assets" expanded="True">
               <Node name="ClientConnectionCode" expanded="True" />
-              <Node name="RoadTextures" expanded="True" />
-              <Node name="Scripts" expanded="True">
-                <Node name="TrafficTriggerScript.cs" selected="True" />
-              </Node>
-              <Node name="Sprites" expanded="True" />
+              <Node name="Pallets" expanded="True" />
+              <Node name="Scripts" expanded="True" />
             </Node>
+            <Node name="Packages" expanded="True" />
           </Node>
         </State>
       </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="d48a1b37-5c8e-4950-879d-146fee206b17" />
 </Properties>
