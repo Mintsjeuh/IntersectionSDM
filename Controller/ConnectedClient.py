@@ -3,7 +3,6 @@ class ConnectedClient(object):
         self.connected_client = []
 
     def __get__(self, instance, owner):
-        print("GET client")
         return self.connected_client
 
     def __set__(self, instance, updated_connected_client):

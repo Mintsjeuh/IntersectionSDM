@@ -11,7 +11,6 @@ PORT = 11000  # The port used by the server.
 
 def set_data():
     send_data = '[{"id": 42.0, "weight": ' + str(random.randint(0, 1)) + '},' \
-                ' {"id": 99.0, "weight": ' + str(random.randint(0, 1)) + '},' \
                 ' {"id": 1.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 2.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 5.1, "weight": ' + str(random.randint(0, 20)) + '},' \
@@ -22,6 +21,10 @@ def set_data():
                 ' {"id": 10.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 11.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 12.1, "weight": ' + str(random.randint(0, 20)) + '},' \
+                ' {"id": 99.0, "weight": ' + str(random.randint(2, 2)) + '},' \
+                ' {"id": 154.0, "weight": ' + str(random.randint(1, 2)) + '},' \
+                ' {"id": 152.0, "weight": ' + str(random.randint(1, 2)) + '},' \
+                ' {"id": 160.0, "weight": ' + str(random.randint(1, 2)) + '},' \
                 ' {"id": 35.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 35.2, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 36.1, "weight": ' + str(random.randint(0, 20)) + '},' \
@@ -38,10 +41,7 @@ def set_data():
                 ' {"id": 31.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 32.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 32.2, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 22.0, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 152.0, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 154.0, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 160.0, "weight": ' + str(random.randint(0, 20)) + '}]'
+                ' {"id": 22.0, "weight": ' + str(random.randint(0, 20)) + '}]'
 
     return send_data
 
