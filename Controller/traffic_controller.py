@@ -20,8 +20,9 @@ bike_lane_ids = [float(86.1), float(26.1), float(88.1), float(28.1), float(22.0)
 
 barriers_id = float(99.0)
 
-lights_id_array = [bus_id,
+lights_id_array = [train_ids[0], train_ids[1], train_ids[2],
                    barriers_id,
+                   bus_id,
                    float(1.1),
                    float(2.1),
                    float(5.1),
@@ -37,8 +38,7 @@ lights_id_array = [bus_id,
                    float(31.2), float(31.1), float(32.1), float(32.2),  # pedestrian_east
                    float(86.1), float(26.1),  # bike_lane_west
                    float(88.1), float(28.1),  # bike_lane_north
-                   float(22.0),  # bike_lane_east
-                   train_ids[0], train_ids[1], train_ids[2]
+                   float(22.0)  # bike_lane_east
                    ]
 
 green_stages = [
@@ -97,10 +97,10 @@ def handle_connection():
         if str(current_green_stage[-1]).__contains__("train"):
             motorized_vehicle_green_stage = False
             train_green_stage = True
-            if str(current_green_stage[-1].__contains__("bus")):
+            if str(current_green_stage[-1]).__contains__("bus"):
                 bus_green_stage = True
 
-        elif str(current_green_stage[-1].__contains__("bus")):
+        elif str(current_green_stage[-1]).__contains__("bus"):
             motorized_vehicle_green_stage = False
             bus_green_stage = True
             train_green_stage = False
@@ -108,7 +108,6 @@ def handle_connection():
             motorized_vehicle_green_stage = True
             bus_green_stage = False
             train_green_stage = False
-
 
     set_lights_green(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
     server.send(encoder.serialize(traffic_lights_array.traffic_lights, traffic_timer))
@@ -121,10 +120,10 @@ def handle_connection():
                 if str(current_green_stage[-1]).__contains__("train"):
                     motorized_vehicle_green_stage = False
                     train_green_stage = True
-                    if str(current_green_stage[-1].__contains__("bus")):
+                    if str(current_green_stage[-1]).__contains__("bus"):
                         bus_green_stage = True
 
-                elif str(current_green_stage[-1].__contains__("bus")):
+                elif str(current_green_stage[-1]).__contains__("bus"):
                     motorized_vehicle_green_stage = False
                     bus_green_stage = True
                     train_green_stage = False
