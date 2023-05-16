@@ -64,8 +64,7 @@ green_stages = [
 
 priority_green_stages = [
     [float(42.0), float(7.1), float(8.1), "bus_green_stage"],
-    [float(160.0), float(1.1), float(2.1), float(8.1), "train_green_stage"],
-    [float(160.0), float(42.0), float(8.1), "train_and_bus_green_stage"]
+    [float(160.0), float(1.1), float(2.1), float(8.1), "train_green_stage"]
 ]
 
 traffic_lights_array = traffic_lights.ReturnTrafficLights()
@@ -90,56 +89,37 @@ def handle_connection():
     bus_green_stage = False
     train_green_stage = False
 
-    deserialized_JSON = get_deserialized_JSON(current_connection)
-    current_green_stage = get_green_stage(deserialized_JSON)
-
-    if tick == 0:
-        if str(current_green_stage[-1]).__contains__("train"):
-            motorized_vehicle_green_stage = False
-            train_green_stage = True
-            if str(current_green_stage[-1]).__contains__("bus"):
-                bus_green_stage = True
-
-        elif str(current_green_stage[-1]).__contains__("bus"):
-            motorized_vehicle_green_stage = False
-            bus_green_stage = True
-            train_green_stage = False
-        else:
-            motorized_vehicle_green_stage = True
-            bus_green_stage = False
-            train_green_stage = False
-
-    set_lights_green(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
-    server.send(encoder.serialize(traffic_lights_array.traffic_lights, traffic_timer))
-
     while True:
         print("Timer: ", traffic_timer.remainingTime)
         deserialized_JSON = get_deserialized_JSON(current_connection)
         if deserialized_JSON is not None:
             if tick == 0:
+                current_green_stage = get_green_stage(deserialized_JSON)
+
                 if str(current_green_stage[-1]).__contains__("train"):
-                    motorized_vehicle_green_stage = False
                     train_green_stage = True
-                    if str(current_green_stage[-1]).__contains__("bus"):
-                        bus_green_stage = True
+                    bus_green_stage = False
+                    motorized_vehicle_green_stage = False
 
                 elif str(current_green_stage[-1]).__contains__("bus"):
-                    motorized_vehicle_green_stage = False
+                    train_green_stage = False
                     bus_green_stage = True
-                    train_green_stage = False
+                    motorized_vehicle_green_stage = False
                 else:
-                    motorized_vehicle_green_stage = True
-                    bus_green_stage = False
                     train_green_stage = False
+                    bus_green_stage = False
+                    motorized_vehicle_green_stage = True
+
+                set_lights_green(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
 
             tick += 1
             print(tick)
 
             # handle train ticks
-            if train_green_stage is True:
+            if train_green_stage:
                 if tick / 2 == train_cross_time:
                     # receive JSON, set green lights to orange and wait for orange time
-                    set_lights_orange(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
+                    set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
 
                 if tick / 2 == train_cross_time + train_barriers_time:
                     # receive JSON, set orange lights to red and wait for traffic clear time
@@ -147,14 +127,12 @@ def handle_connection():
 
                 if tick / 2 == train_cross_time + train_barriers_time + train_clear_time:
                     tick = 0
-                    current_green_stage = get_green_stage(deserialized_JSON)
-                    set_lights_green(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
 
             # handle motorized vehicle tick
-            if motorized_vehicle_green_stage is True:
+            if bus_green_stage:
                 if tick / 2 == motorized_vehicle_time:
                     # receive JSON, set green lights to orange and wait for orange time
-                    set_lights_orange(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
+                    set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
 
                 if tick / 2 == motorized_vehicle_time + orange_wait_time:
                     # receive JSON, set orange lights to red and wait for traffic clear time
@@ -162,8 +140,20 @@ def handle_connection():
 
                 if tick / 2 == motorized_vehicle_time + orange_wait_time + traffic_clear_time:
                     tick = 0
-                    current_green_stage = get_green_stage(deserialized_JSON)
-                    set_lights_green(current_green_stage, motorized_vehicle_green_stage, train_green_stage)
+
+
+            # handle motorized vehicle tick
+            if motorized_vehicle_green_stage:
+                if tick / 2 == motorized_vehicle_time:
+                    # receive JSON, set green lights to orange and wait for orange time
+                    set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
+
+                if tick / 2 == motorized_vehicle_time + orange_wait_time:
+                    # receive JSON, set orange lights to red and wait for traffic clear time
+                    set_lights_red()
+
+                if tick / 2 == motorized_vehicle_time + orange_wait_time + traffic_clear_time:
+                    tick = 0
 
             server.send(encoder.serialize(traffic_lights_array.traffic_lights, traffic_timer))
 
@@ -215,15 +205,14 @@ def check_vehicle_priorities():
 
     for i in range(len(train_ids)):
         if vehicle_priorities.check(train_ids[i]):
-            if vehicle_priorities.check(bus_id):
-                green_stage = [tb for tb in priority_green_stages if tb[-1] == "train_and_bus_green_stage"][0]
-            else:
-                green_stage = [t for t in priority_green_stages if t[-1] == "train_green_stage"][0]
+            green_stage = [t for t in priority_green_stages if t[-1] == "train_green_stage"][0]
             green_stage[0] = train_ids[i]
             return green_stage
 
     if vehicle_priorities.check(bus_id):
-        return [b for b in priority_green_stages if b[-1] == "bus_green_stage"][0]
+        green_stage = [b for b in priority_green_stages if b[-1] == "bus_green_stage"][0]
+        return green_stage
+
     else:
         return False
 
@@ -252,6 +241,7 @@ def set_lights_red():
 
     for i in range(len(set_lights_array)):
         if set_lights_array[i].id == barriers_id:
+            print("Barrier set to 2")
             set_lights_array[i].status = 2
         else:
             set_lights_array[i].status = 0
@@ -259,14 +249,14 @@ def set_lights_red():
     traffic_lights_array.traffic_lights = set_lights_array
 
 
-def set_lights_orange(green_stage, motorized_vehicle_green_stage, train_green_stage):
+def set_lights_orange(green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage):
     set_lights_array = traffic_lights_array.traffic_lights
 
     for j in range(len(green_stage)):
         for k in range(len(set_lights_array)):
 
             if set_lights_array[k].id == barriers_id:
-                if motorized_vehicle_green_stage is True:
+                if motorized_vehicle_green_stage is True or bus_green_stage is True:
                     set_lights_array[k].status = 2
                 elif train_green_stage is True:
                     set_lights_array[k].status = 1
@@ -277,14 +267,14 @@ def set_lights_orange(green_stage, motorized_vehicle_green_stage, train_green_st
     traffic_lights_array.traffic_lights = set_lights_array
 
 
-def set_lights_green(green_stage, motorized_vehicle_green_stage, train_green_stage):
+def set_lights_green(green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage):
     set_lights_array = traffic_lights_array.traffic_lights
 
     for j in range(len(green_stage)):
         for k in range(len(set_lights_array)):
 
             if set_lights_array[k].id == barriers_id:
-                if motorized_vehicle_green_stage is True:
+                if motorized_vehicle_green_stage is True or bus_green_stage is True:
                     set_lights_array[k].status = 2
                 elif train_green_stage is True:
                     set_lights_array[k].status = 0
