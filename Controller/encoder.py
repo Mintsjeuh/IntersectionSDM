@@ -1,6 +1,7 @@
 import json
 import Controller.Light as light
 
+
 def serialize(lights_array, traffic_timer):
     lights_array_JSON = []
     traffic_timer_JSON = {"id": traffic_timer.id, "status": traffic_timer.status, "remainingTime": traffic_timer.remainingTime}
@@ -20,8 +21,6 @@ def deserialize(lights_array_JSON):
     deserialized_JSON = []
 
     lights_array_JSON = json.loads(lights_array_JSON)
-
-    # traffic_lights = lights_array_JSON['trafficlights']
 
     for i in range(len(lights_array_JSON)):
         deserialized_JSON.append([float(lights_array_JSON[i]['id']), lights_array_JSON[i]['weight']])

@@ -16,7 +16,7 @@ train_clear_time = 3
 
 bus_id = float(42.0)
 train_ids = [float(160.0), float(154.0), float(152.0)]
-bike_lane_ids = [float(86.1), float(26.1), float(88.1), float(28.1), float(22.0)]
+bike_lane_ids = [float(22.0), float(26.1), float(28.1), float(86.1), float(88.1)]
 
 barriers_id = float(99.0)
 
@@ -89,12 +89,17 @@ def handle_connection():
     bus_green_stage = False
     train_green_stage = False
 
+    timer_reset = False
+
     while True:
         print("Timer: ", traffic_timer.remainingTime)
         deserialized_JSON = get_deserialized_JSON(current_connection)
         if deserialized_JSON is not None:
             if tick == 0:
-                current_green_stage = get_green_stage(deserialized_JSON)
+                if traffic_timer.remainingTime < 20:
+                    current_green_stage = green_stages[3]
+                else:
+                    current_green_stage = get_green_stage(deserialized_JSON)
 
                 if str(current_green_stage[-1]).__contains__("train"):
                     train_green_stage = True
@@ -104,56 +109,58 @@ def handle_connection():
                 elif str(current_green_stage[-1]).__contains__("bus"):
                     train_green_stage = False
                     bus_green_stage = True
-                    motorized_vehicle_green_stage = False
+                    motorized_vehicle_green_stage = True
                 else:
                     train_green_stage = False
                     bus_green_stage = False
                     motorized_vehicle_green_stage = True
 
-                set_lights_green(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
+                if train_green_stage:
+                    set_lights_orange_barrier()
+                else:
+                    set_lights_green(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
+                    timer_reset = check_timer_reset()
+                    if timer_reset is True:
+                        end_timer()
 
             tick += 1
             print(tick)
 
+            if tick != 0 and tick % 2 == 0 and is_timer_active() and bus_green_stage is False and timer_reset is False:
+                traffic_timer.remainingTime -= 1
+
             # handle train ticks
             if train_green_stage:
-                if tick / 2 == train_cross_time:
-                    # receive JSON, set green lights to orange and wait for orange time
+                if tick / 2 == train_barriers_time:
+                    set_lights_green(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
+                    timer_reset = check_timer_reset()
+                    if timer_reset is True:
+                        end_timer()
+
+                if tick / 2 == train_barriers_time + train_cross_time:
                     set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
 
-                if tick / 2 == train_cross_time + train_barriers_time:
-                    # receive JSON, set orange lights to red and wait for traffic clear time
+                if tick / 2 == train_barriers_time + train_cross_time + train_barriers_time:
                     set_lights_red()
 
-                if tick / 2 == train_cross_time + train_barriers_time + train_clear_time:
+                if tick / 2 == train_barriers_time + train_cross_time + train_barriers_time + train_clear_time:
                     tick = 0
-
-            # handle motorized vehicle tick
-            if bus_green_stage:
-                if tick / 2 == motorized_vehicle_time:
-                    # receive JSON, set green lights to orange and wait for orange time
-                    set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
-
-                if tick / 2 == motorized_vehicle_time + orange_wait_time:
-                    # receive JSON, set orange lights to red and wait for traffic clear time
-                    set_lights_red()
-
-                if tick / 2 == motorized_vehicle_time + orange_wait_time + traffic_clear_time:
-                    tick = 0
+                    if timer_reset is True:
+                        reset_timer()
 
 
             # handle motorized vehicle tick
             if motorized_vehicle_green_stage:
                 if tick / 2 == motorized_vehicle_time:
-                    # receive JSON, set green lights to orange and wait for orange time
                     set_lights_orange(current_green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage)
 
                 if tick / 2 == motorized_vehicle_time + orange_wait_time:
-                    # receive JSON, set orange lights to red and wait for traffic clear time
                     set_lights_red()
 
                 if tick / 2 == motorized_vehicle_time + orange_wait_time + traffic_clear_time:
                     tick = 0
+                    if timer_reset is True:
+                        reset_timer()
 
             server.send(encoder.serialize(traffic_lights_array.traffic_lights, traffic_timer))
 
@@ -241,10 +248,19 @@ def set_lights_red():
 
     for i in range(len(set_lights_array)):
         if set_lights_array[i].id == barriers_id:
-            print("Barrier set to 2")
             set_lights_array[i].status = 2
         else:
             set_lights_array[i].status = 0
+
+    traffic_lights_array.traffic_lights = set_lights_array
+
+
+def set_lights_orange_barrier():
+    set_lights_array = traffic_lights_array.traffic_lights
+
+    for k in range(len(set_lights_array)):
+        if set_lights_array[k].id == barriers_id:
+            set_lights_array[k].status = 1
 
     traffic_lights_array.traffic_lights = set_lights_array
 
@@ -285,4 +301,35 @@ def set_lights_green(green_stage, train_green_stage, bus_green_stage, motorized_
     traffic_lights_array.traffic_lights = set_lights_array
 
 
+def is_timer_active():
+    traffic_lights = traffic_lights_array.traffic_lights
+    timer_active = False
 
+    for i in range(len(bike_lane_ids)):
+        for j in range(len(traffic_lights)):
+            if bike_lane_ids[i] == traffic_lights[j].id:
+                if traffic_lights[j].weight != 0:
+                    timer_active = True
+                    return timer_active
+
+    return timer_active
+
+
+def check_timer_reset():
+    traffic_lights = traffic_lights_array.traffic_lights
+
+    for i in range(len(bike_lane_ids)):
+        for j in range(len(traffic_lights)):
+            if bike_lane_ids[i] == traffic_lights[j].id:
+                if traffic_lights[j].status == 2:
+                    return True
+
+    return False
+
+
+def end_timer():
+    traffic_timer.remainingTime = 0
+
+
+def reset_timer():
+    traffic_timer.remainingTime = 120

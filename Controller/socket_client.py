@@ -21,8 +21,8 @@ def set_data():
                 ' {"id": 11.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 12.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 22.0, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 26.1, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 28.1, "weight": ' + str(random.randint(0, 20)) + '},' \
+                ' {"id": 26.1, "weight": ' + str(random.randint(0, 0)) + '},' \
+                ' {"id": 28.1, "weight": ' + str(random.randint(0, 0)) + '},' \
                 ' {"id": 31.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 31.2, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 32.1, "weight": ' + str(random.randint(0, 20)) + '},' \
@@ -35,12 +35,12 @@ def set_data():
                 ' {"id": 37.2, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 38.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 38.2, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 86.1, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 88.1, "weight": ' + str(random.randint(0, 20)) + '},' \
-                ' {"id": 42.0, "weight": ' + str(random.randint(1, 1)) + '},' \
+                ' {"id": 86.1, "weight": ' + str(random.randint(0, 0)) + '},' \
+                ' {"id": 88.1, "weight": ' + str(random.randint(0, 0)) + '},' \
+                ' {"id": 42.0, "weight": ' + str(random.randint(0, 1)) + '},' \
                 ' {"id": 152.0, "weight": ' + str(random.randint(0, 0)) + '},' \
-                ' {"id": 154.0, "weight": ' + str(random.randint(0, 1)) + '},' \
-                ' {"id": 160.0, "weight": ' + str(random.randint(0, 0)) + '},' \
+                ' {"id": 154.0, "weight": ' + str(random.randint(0, 0)) + '},' \
+                ' {"id": 160.0, "weight": ' + str(random.randint(0, 1)) + '},' \
                 ' {"id": 99.0, "weight": ' + str(random.randint(0, 2)) + '}]'
 
     return send_data
