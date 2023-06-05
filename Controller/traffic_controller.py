@@ -16,7 +16,7 @@ train_clear_time = 3
 
 bus_id = float(42.0)
 train_ids = [float(160.0), float(154.0), float(152.0)]
-bike_lane_ids = [float(22.0), float(26.1), float(28.1), float(86.1), float(88.1)]
+bike_lane_ids = [float(26.1), float(86.1)]
 
 barriers_id = float(99.0)
 
@@ -63,8 +63,16 @@ green_stages = [
 ]
 
 priority_green_stages = [
-    [float(42.0), float(7.1), float(8.1), "bus_green_stage"],
-    [float(160.0), float(1.1), float(2.1), float(8.1), "train_green_stage"]
+    [float(42.0),
+     float(37.2), float(37.1), float(38.1), float(38.2),
+     float(88.1), float(28.1),
+     float(7.1), float(8.1), "bus_green_stage"],
+
+    [float(160.0),
+     float(9.1),
+     float(31.2), float(31.1), float(32.1), float(32.2),
+     float(22.0),
+     "train_green_stage"]
 ]
 
 traffic_lights_array = traffic_lights.ReturnTrafficLights()
