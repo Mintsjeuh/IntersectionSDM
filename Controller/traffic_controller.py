@@ -6,20 +6,23 @@ import Controller.TrafficLights as traffic_lights
 import Controller.vehicle_priorities as vehicle_priorities
 import Controller.Timer as Timer
 
+# set motorized vehicle times
 motorized_vehicle_time = 7
 orange_wait_time = 3
 traffic_clear_time = 3
 
+# set train timings
 train_cross_time = 10
 train_barriers_time = 3
 train_clear_time = 3
 
+# name important ids
 bus_id = float(42.0)
 train_ids = [float(160.0), float(154.0), float(152.0)]
 bike_lane_ids = [float(26.1), float(86.1)]
-
 barriers_id = float(99.0)
 
+# list of all ids
 lights_id_array = [train_ids[0], train_ids[1], train_ids[2],
                    barriers_id,
                    bus_id,
@@ -41,6 +44,7 @@ lights_id_array = [train_ids[0], train_ids[1], train_ids[2],
                    float(22.0)  # bike_lane_east
                    ]
 
+# clusters of traffic lights that can go green at the same time
 green_stages = [
     [float(1.1), float(2.1), float(7.1), float(8.1), 0],
 
@@ -62,6 +66,7 @@ green_stages = [
      float(7.1), float(9.1), 0]
 ]
 
+# green stages with priorities
 priority_green_stages = [
     [float(42.0),
      float(37.2), float(37.1), float(38.1), float(38.2),
@@ -75,6 +80,7 @@ priority_green_stages = [
      "train_green_stage"]
 ]
 
+# importing objects
 traffic_lights_array = traffic_lights.ReturnTrafficLights()
 connected_client_array = connected_client.ReturnConnectedClient()
 traffic_timer = Timer.Timer()
@@ -173,6 +179,7 @@ def handle_connection():
             server.send(encoder.serialize(traffic_lights_array.traffic_lights, traffic_timer))
 
 
+# get JSON from the socket server and deserialize it
 def get_deserialized_JSON(current_connection):
     received_JSON = server.receive(connection=current_connection[0], client_address=current_connection[1])
     deserialized_JSON = encoder.deserialize(received_JSON)
@@ -180,6 +187,7 @@ def get_deserialized_JSON(current_connection):
     return deserialized_JSON
 
 
+# check if priorities are needed, return one green stage
 def get_green_stage(deserialized_JSON):
     # set the weights for the Light objects
     weighted_lights_array = set_weight(deserialized_JSON)
@@ -197,7 +205,7 @@ def get_green_stage(deserialized_JSON):
     return green_stage
 
 
-
+# set the weights from the JSON in the light objects
 def set_weight(deserialized_JSON):
     weighted_lights_array = traffic_lights_array.traffic_lights
 
@@ -210,12 +218,14 @@ def set_weight(deserialized_JSON):
 
     traffic_lights_array.traffic_lights = weighted_lights_array
 
+    # print all green stages
     # for k in range(len(weighted_lights_array)):
     #     print(weighted_lights_array[k].id, weighted_lights_array[k].status, weighted_lights_array[k].weight)
 
     return weighted_lights_array
 
 
+# check if there are priority vehicles, return priority green stage if so
 def check_vehicle_priorities():
 
     for i in range(len(train_ids)):
@@ -232,6 +242,7 @@ def check_vehicle_priorities():
         return False
 
 
+# get all weights from the traffic lights in the green stage and add them together
 def calculate_green_stage_weights(weighted_lights_array):
     for i in range(len(green_stages)):
         green_stage_total_weight = 0
@@ -245,12 +256,14 @@ def calculate_green_stage_weights(weighted_lights_array):
     return green_stages
 
 
+# sort the green stages by cumulative weight
 def sort_green_stage_weights(calculated_weights_array):
     sorted_green_stages = sorted(calculated_weights_array, key=lambda x: x[-1], reverse=True)
 
     return sorted_green_stages[0]
 
 
+# set traffic lights to red
 def set_lights_red():
     set_lights_array = traffic_lights_array.traffic_lights
 
@@ -263,6 +276,7 @@ def set_lights_red():
     traffic_lights_array.traffic_lights = set_lights_array
 
 
+# set the barrier to closing or opening (orange)
 def set_lights_orange_barrier():
     set_lights_array = traffic_lights_array.traffic_lights
 
@@ -273,6 +287,7 @@ def set_lights_orange_barrier():
     traffic_lights_array.traffic_lights = set_lights_array
 
 
+# set the green lights to orange
 def set_lights_orange(green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage):
     set_lights_array = traffic_lights_array.traffic_lights
 
@@ -291,6 +306,7 @@ def set_lights_orange(green_stage, train_green_stage, bus_green_stage, motorized
     traffic_lights_array.traffic_lights = set_lights_array
 
 
+# set the green stage traffic lights to green
 def set_lights_green(green_stage, train_green_stage, bus_green_stage, motorized_vehicle_green_stage):
     set_lights_array = traffic_lights_array.traffic_lights
 
@@ -309,6 +325,7 @@ def set_lights_green(green_stage, train_green_stage, bus_green_stage, motorized_
     traffic_lights_array.traffic_lights = set_lights_array
 
 
+# check if timer is active, return boolean
 def is_timer_active():
     traffic_lights = traffic_lights_array.traffic_lights
     timer_active = False
@@ -323,6 +340,7 @@ def is_timer_active():
     return timer_active
 
 
+# check if the timer needs to be reset, return boolean
 def check_timer_reset():
     traffic_lights = traffic_lights_array.traffic_lights
 
@@ -335,9 +353,11 @@ def check_timer_reset():
     return False
 
 
+# end the timer and set timer to zero
 def end_timer():
     traffic_timer.remainingTime = 0
 
 
+# reset the timer to 120
 def reset_timer():
     traffic_timer.remainingTime = 120

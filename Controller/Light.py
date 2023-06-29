@@ -1,3 +1,4 @@
+# traffic light object
 class Light:
     def __init__(self, id, status, weight, red_time):
         self.id = id

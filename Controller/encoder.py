@@ -2,6 +2,7 @@ import json
 import Controller.Light as light
 
 
+# serialize the traffic light objects and the timer to a JSON string
 def serialize(lights_array, traffic_timer):
     lights_array_JSON = []
     traffic_timer_JSON = {"id": traffic_timer.id, "status": traffic_timer.status, "remainingTime": traffic_timer.remainingTime}
@@ -17,6 +18,7 @@ def serialize(lights_array, traffic_timer):
     return json.dumps(array_JSON, default=serialize)
 
 
+# deserialize JSON to dictionary named data
 def deserialize(lights_array_JSON):
     deserialized_JSON = []
 

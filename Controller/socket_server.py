@@ -17,6 +17,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
     client.
     """
 
+    # handle connection when client connects
     def handle(self):
         client = []
         # self.request is the TCP socket connected to the client
@@ -32,6 +33,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
         controller.handle_connection()
 
 
+# receive JSON from client
 def receive(connection, client_address):
     received_bytes = connection.recv(2048).strip()
     received_string = received_bytes.decode('utf8')
@@ -39,6 +41,7 @@ def receive(connection, client_address):
     return received_string
 
 
+# send data to client
 def send(data):
     # send the JSON-string to the client
     send_data = data
@@ -47,6 +50,8 @@ def send(data):
 
     print("Sent bytes to simulator: ", send_bytes)
 
+
+# run server
 def run():
     print("IP-address of server:", HOST)
     # Create the server, binding to HOST on PORT

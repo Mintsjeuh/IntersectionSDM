@@ -1,3 +1,4 @@
+# timer object
 class Timer:
     _instance = None
 

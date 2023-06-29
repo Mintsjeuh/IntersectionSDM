@@ -9,6 +9,7 @@ HOST = socket.gethostbyname(socket.gethostname())  # The server's hostname or IP
 PORT = 11000  # The port used by the server.
 
 
+# set random values for the JSON string
 def set_data():
     send_data = '[{"id": 1.1, "weight": ' + str(random.randint(0, 20)) + '},' \
                 ' {"id": 2.1, "weight": ' + str(random.randint(0, 20)) + '},' \
@@ -46,6 +47,8 @@ def set_data():
     return send_data
 
 
+# client for testing the controller
+# connect to the server and send data
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     send_data = set_data()
